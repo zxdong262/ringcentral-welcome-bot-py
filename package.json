@@ -1,0 +1,17 @@
+{
+  "name": "ringcentral-welcome-bot-py",
+  "version": "0.0.1",
+  "description": "Glip bot to welcome new team member",
+  "keywords": [
+    "ringcentral",
+    "bot",
+    "framework",
+    "python",
+    "template"
+  ],
+  "devDependencies": {
+    "js-yaml": "3.12.2",
+    "serverless": "1.33.2",
+    "serverless-python-requirements": "4.2.5"
+  }
+}

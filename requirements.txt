@@ -1,0 +1,5 @@
+flask
+python-dotenv
+pylint
+ringcentral_bot_framework == 0.3.0b1
+boto3

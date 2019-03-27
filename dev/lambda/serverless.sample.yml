@@ -1,0 +1,98 @@
+
+service: ringcentral-bot # NOTE: update this with your service name
+
+provider:
+  name: aws
+  runtime: python3.6
+  # use existing policies
+  iamManagedPolicies:
+    - 'arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess'
+    - 'arn:aws:iam::aws:policy/AWSLambdaExecute'
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - lambda:InvokeFunction
+      Resource: "*"
+
+# you can overwrite defaults here
+#  stage: dev
+#  region: us-east-1
+
+# you can add statements to the Lambda function's IAM Role here
+#  iamRoleStatements:
+#    - Effect: "Allow"
+#      Action:
+#        - "s3:ListBucket"
+#      Resource: { "Fn::Join" : ["", ["arn:aws:s3:::", { "Ref" : "ServerlessDeploymentBucket" } ] ]  }
+#    - Effect: "Allow"
+#      Action:
+#        - "s3:PutObject"
+#      Resource:
+#        Fn::Join:
+#          - ""
+#          - - "arn:aws:s3:::"
+#            - "Ref" : "ServerlessDeploymentBucket"
+#            - "/*"
+
+# you can define service wide environment variables here
+  environment:
+    ENV: production
+    # ringcentral apps
+
+    ## for bots auth, required
+    RINGCENTRAL_BOT_CLIENT_ID:
+    RINGCENTRAL_BOT_CLIENT_SECRET:
+
+    ## for user auth, could be empty if do not need user auth
+    RINGCENTRAL_USER_CLIENT_ID:
+    RINGCENTRAL_USER_CLIENT_SECRET:
+
+    ## common
+    RINGCENTRAL_SERVER: https://platform.devtest.ringcentral.com
+    RINGCENTRAL_BOT_SERVER: https://xxxxx.execute-api.us-east-1.amazonaws.com/dev
+
+    # db
+    DB_TYPE: dynamodb
+    DYNAMODB_TABLE_PREFIX: ringcentral-bot
+    DYNAMODB_REGION: us-east-1
+    DYNAMODB_ReadCapacityUnits: 1
+    DYNAMODB_WriteCapacityUnits: 1
+
+# you can add packaging information here
+package:
+  include:
+    - ringcentral_bot_framework
+  exclude:
+    - flask
+    - python-dotenv
+    - boto3
+
+exclude:
+  - package-lock*
+  - __pycache__
+  - serverless.sample.yml
+
+functions:
+  bot:
+    handler: handler.bot
+    timeout: 400
+    # you can existing role
+    # role: arn:aws:iam::44444444:role/xxxx-us-east-1-lambdaRole
+    events:
+      - http:
+          method: any
+          path: /{action+}
+          cors: true
+
+plugins:
+  - serverless-python-requirements
+
+custom:
+  pythonRequirements:
+    dockerizePip: non-linux
+    slim: true
+    noDeploy:
+      - flask
+      - python-dotenv
+      - pylint
+      - boto3
